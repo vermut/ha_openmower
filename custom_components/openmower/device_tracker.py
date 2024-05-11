@@ -4,15 +4,15 @@ import logging
 import math
 
 from homeassistant.components import mqtt
-from homeassistant.components.device_tracker import TrackerEntity
+from homeassistant.components.device_tracker import TrackerEntity, SourceType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PREFIX, CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.json import json_loads_object
+
 from .const import DOMAIN
-from ..device_tracker import SourceType
 
 _LOGGER = logging.getLogger(__name__)
 

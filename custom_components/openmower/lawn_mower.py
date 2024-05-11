@@ -1,19 +1,19 @@
 import logging
 
-from homeassistant.const import CONF_PREFIX
-from helpers.device_registry import DeviceInfo
+from homeassistant.components import mqtt
 from homeassistant.components.lawn_mower import (
     LawnMowerActivity,
     LawnMowerEntity,
     LawnMowerEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_PREFIX
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.json import json_loads_object
 
 from .const import DOMAIN
-from homeassistant.components import mqtt
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, CONF_PREFIX
+from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE, CONF_PREFIX
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from .const import DOMAIN
-from homeassistant.components import mqtt
 from homeassistant.util.json import json_loads_object
+
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
