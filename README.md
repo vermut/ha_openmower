@@ -11,6 +11,8 @@ This integration is based on MQTT messages from the openmower container that run
 
 It will give you full control over the mower. Buttons to start, stop, pause, create automations from etc. Statistics like battery load, motor temperature, location. GPS coordinates are integrated into the device tracker.
 
+![alt text](docs/image-9.png)
+
 Prerequisites
 ===
 * A functional openmower (doh!)
@@ -71,4 +73,4 @@ Nice way to get stats from the RPI into your HA. Install as a service/container 
 
 ![alt text](docs/image-8.png)
 
-Place the config file in /share in your HA, remember to do it IN the HA container if you run like that.
+Place the config file in /share/mosquitto in your HA, remember to do it IN the HA container if you run like that.
