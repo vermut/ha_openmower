@@ -13,6 +13,7 @@ It will give you full control over the mower. Buttons to start, stop, pause, cre
 
 ![alt text](docs/image-9.png)
 
+
 Prerequisites
 ===
 * A functional openmower (doh!)
@@ -36,12 +37,13 @@ Once installed it will turn up in the normal integrations as MQTT.
 
 ![alt text](docs/image-7.png)
 
+
 Installation
 ===
 
 Install via HACS by adding https://github.com/vermut/ha_openmower.git as a Custom Repository. Refresh HACS, go to Openmower and download the integration.
 
-Add the integration in settings -> integrations. Here you fill in the details for your mower. The prefix you set in the config and the LON/LAT in the same config file.
+Add the integration in settings -> integrations. Here you fill in the details for your mower. I.e. the prefix and the LAT/LONG from the openmower config file.
 
 ![alt text](docs/image-1.png)
 
@@ -52,18 +54,18 @@ Your mower should now turn up in Home assistant
 ![alt text](docs/image.png)
 
 
-
 Troubleshooting
 ===
-Verify that mqtt is active on the mower and check if xbot_moniroting is connected to homeassistant.
+Verify that mqtt is active on the openmower and check if xbot_monitoring is connected to homeassistant.
 ```
 openmower@openmower:~ $ sudo netstat -pnt | grep 1883 | grep xbot_monitoring
 tcp        0      0 127.0.0.1:42818         127.0.0.1:1883          ESTABLISHED 911/xbot_monitoring
 tcp        0      0 <MOWER_IP>:43340     <HOMEASSISTANT_IP>:1883      ESTABLISHED 911/xbot_monitoring
 ```
-Verify that messages actually reach HA. In the MQTT integration listen for topic # or openmower/# if your prefix is openmower.
+Verify that messages actually reach HA. In the MQTT integration listen for topic # or e.g. openmower/# if your prefix is openmower.
 
 ![alt text](docs/image-3.png)
+
 
 Additional resources
 ===
