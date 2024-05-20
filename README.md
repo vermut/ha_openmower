@@ -62,3 +62,13 @@ tcp        0      0 <MOWER_IP>:43340     <HOMEASSISTANT_IP>:1883      ESTABLISHE
 Verify that messages actually reach HA. In the MQTT integration listen for topic # or openmower/# if your prefix is openmower.
 
 ![alt text](docs/image-3.png)
+
+Additional resources
+===
+
+[RPI MQTT monitor](https://github.com/2m/rpi-mqtt-monitor-docker)
+Nice way to get stats from the RPI into your HA. Install as a service/container on the RPI. In Mosquitto you add a bridge config for the messages.
+
+![alt text](docs/image-8.png)
+
+Place the config file in /share in your HA, remember to do it IN the HA container if you run like that.
