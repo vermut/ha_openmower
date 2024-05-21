@@ -5,13 +5,17 @@ import logging
 from homeassistant.components import mqtt
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, CONF_PREFIX
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.const import (
+    PERCENTAGE,
+    CONF_PREFIX,
+    EntityCategory,
+    UnitOfTemperature,
+    UnitOfElectricPotential,
+    UnitOfElectricCurrent,
+)
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util.json import json_loads_object
-
-from .const import DOMAIN
+from .entity import OpenMowerMqttEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,37 +30,90 @@ async def async_setup_entry(
         _LOGGER.error("MQTT integration is not available")
         return
 
-    async_add_entities([OpenMowerBatterySensor(entry.data[CONF_PREFIX])])
+    prefix = entry.data[CONF_PREFIX]
+    async_add_entities(
+        [
+            OpenMowerBatterySensor(
+                "Battery", prefix, "robot_state/json", "battery_percentage"
+            ),
+            OpenMowerDiagnosticSensor(
+                "Current action progress",
+                prefix,
+                "robot_state/json",
+                "current_action_progress",
+            ),
+            OpenMowerDiagnosticSensor(
+                "GPS Percentage", prefix, "robot_state/json", "gps_percentage"
+            ),
+            OpenMowerMqttSensorEntity(
+                "Current State", prefix, "robot_state/json", "current_state"
+            ),
+            OpenMowerCurrentSensor(
+                "Charge Current", prefix, "sensors/om_charge_current/data", None
+            ),
+            OpenMowerRawDiagnosticSensor(
+                "GPS Accuracy", prefix, "sensors/om_gps_accuracy/data", None
+            ),
+            OpenMowerTemperatureSensor(
+                "Left ESC Temperature", prefix, "sensors/om_left_esc_temp/data", None
+            ),
+            OpenMowerTemperatureSensor(
+                "Mow ESC Temperature", prefix, "sensors/om_mow_esc_temp/data", None
+            ),
+            OpenMowerCurrentSensor(
+                "Mow Motor Current", prefix, "sensors/om_mow_motor_current/data", None
+            ),
+            OpenMowerTemperatureSensor(
+                "Mow Motor Temperature", prefix, "sensors/om_mow_motor_temp/data", None
+            ),
+            OpenMowerTemperatureSensor(
+                "Right ESC Temperature", prefix, "sensors/om_right_esc_temp/data", None
+            ),
+            OpenMowerVoltageSensor(
+                "Battery Voltage", prefix, "sensors/om_v_battery/data", None
+            ),
+            OpenMowerVoltageSensor(
+                "Charge Voltage", prefix, "sensors/om_v_charge/data", None
+            ),
+        ]
+    )
 
 
-class OpenMowerBatterySensor(SensorEntity):
+class OpenMowerMqttSensorEntity(OpenMowerMqttEntity, SensorEntity):
+    def _process_update(self, value):
+        self._attr_native_value = value
+
+
+class OpenMowerBatterySensor(OpenMowerMqttSensorEntity):
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
 
-    _attr_name = "Battery"
-    _attr_unique_id = "openmower_battery"
-    _attr_device_info = DeviceInfo(
-        identifiers={(DOMAIN, "openmower")}, manufacturer="OpenMower"
-    )
+    def _process_update(self, value):
+        self._attr_native_value = int(float(value) * 100)
 
-    def __init__(self, prefix: str) -> None:
-        self._mqtt_topic_prefix = prefix
-        if self._mqtt_topic_prefix and self._mqtt_topic_prefix[-1] != "/":
-            self._mqtt_topic_prefix = self._mqtt_topic_prefix + "/"
 
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
-        await mqtt.async_subscribe(
-            self.hass,
-            self._mqtt_topic_prefix + "robot_state/json",
-            self.async_robot_state_received,
-            0,
-        )
-        _LOGGER.info("Added to Hass, subscribing to topics")
+class OpenMowerDiagnosticSensor(OpenMowerMqttSensorEntity):
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
-    @callback
-    def async_robot_state_received(self, msg: mqtt.ReceiveMessage) -> None:
-        value_json = json_loads_object(msg.payload)
 
-        self._attr_native_value = int(float(value_json["battery_percentage"]) * 100)
-        self.async_write_ha_state()
+class OpenMowerRawDiagnosticSensor(OpenMowerDiagnosticSensor):
+    def _process_update(self, value):
+        self._attr_native_value = float(value)
+
+
+class OpenMowerCurrentSensor(OpenMowerRawDiagnosticSensor):
+    _attr_device_class = SensorDeviceClass.CURRENT
+    _attr_unit_of_measurement = UnitOfElectricCurrent.AMPERE
+    _attr_suggested_display_precision = 1
+
+
+class OpenMowerTemperatureSensor(OpenMowerRawDiagnosticSensor):
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
+    _attr_suggested_display_precision = 0
+
+
+class OpenMowerVoltageSensor(OpenMowerRawDiagnosticSensor):
+    _attr_device_class = SensorDeviceClass.VOLTAGE
+    _attr_unit_of_measurement = UnitOfElectricPotential.VOLT
+    _attr_suggested_display_precision = 1
