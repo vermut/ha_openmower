@@ -3,7 +3,12 @@ from __future__ import annotations
 import logging
 
 from homeassistant.components import mqtt
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorDeviceClass,
+    SensorStateClass,
+    SensorEntityDescription,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
@@ -12,6 +17,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfElectricPotential,
     UnitOfElectricCurrent,
+    UnitOfLength,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -36,13 +42,13 @@ async def async_setup_entry(
             OpenMowerBatterySensor(
                 "Battery", prefix, "robot_state/json", "battery_percentage"
             ),
-            OpenMowerDiagnosticSensor(
+            OpenMowerDisabledSensor(
                 "Current action progress",
                 prefix,
                 "robot_state/json",
                 "current_action_progress",
             ),
-            OpenMowerDiagnosticSensor(
+            OpenMowerGpsPercentageSensor(
                 "GPS Percentage", prefix, "robot_state/json", "gps_percentage"
             ),
             OpenMowerMqttSensorEntity(
@@ -51,7 +57,7 @@ async def async_setup_entry(
             OpenMowerCurrentSensor(
                 "Charge Current", prefix, "sensors/om_charge_current/data", None
             ),
-            OpenMowerRawDiagnosticSensor(
+            OpenMowerGpsAccuracySensor(
                 "GPS Accuracy", prefix, "sensors/om_gps_accuracy/data", None
             ),
             OpenMowerTemperatureSensor(
@@ -87,33 +93,60 @@ class OpenMowerMqttSensorEntity(OpenMowerMqttEntity, SensorEntity):
 class OpenMowerBatterySensor(OpenMowerMqttSensorEntity):
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
     def _process_update(self, value):
         self._attr_native_value = int(float(value) * 100)
 
 
-class OpenMowerDiagnosticSensor(OpenMowerMqttSensorEntity):
+class OpenMowerGpsPercentageSensor(OpenMowerMqttSensorEntity):
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def _process_update(self, value):
+        self._attr_native_value = int(float(value) * 100)
+
+
+class OpenMowerDisabledSensor(OpenMowerMqttSensorEntity):
+    entity_description = SensorEntityDescription(
+        key="currentStateProgress",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+
+class OpenMowerRawDiagnosticSensor(OpenMowerMqttSensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
-
-class OpenMowerRawDiagnosticSensor(OpenMowerDiagnosticSensor):
     def _process_update(self, value):
         self._attr_native_value = float(value)
 
 
 class OpenMowerCurrentSensor(OpenMowerRawDiagnosticSensor):
     _attr_device_class = SensorDeviceClass.CURRENT
-    _attr_unit_of_measurement = UnitOfElectricCurrent.AMPERE
+    _attr_native_unit_of_measurement = UnitOfElectricCurrent.AMPERE
     _attr_suggested_display_precision = 1
 
 
 class OpenMowerTemperatureSensor(OpenMowerRawDiagnosticSensor):
     _attr_device_class = SensorDeviceClass.TEMPERATURE
-    _attr_unit_of_measurement = UnitOfTemperature.CELSIUS
+    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_suggested_display_precision = 0
 
 
 class OpenMowerVoltageSensor(OpenMowerRawDiagnosticSensor):
     _attr_device_class = SensorDeviceClass.VOLTAGE
-    _attr_unit_of_measurement = UnitOfElectricPotential.VOLT
+    _attr_native_unit_of_measurement = UnitOfElectricPotential.VOLT
     _attr_suggested_display_precision = 1
+
+
+class OpenMowerGpsAccuracySensor(OpenMowerRawDiagnosticSensor):
+    _attr_device_class = SensorDeviceClass.DISTANCE
+    _attr_native_unit_of_measurement = UnitOfLength.METERS
+    _attr_suggested_display_precision = 4
+
+    def _process_update(self, value):
+        super()._process_update(value)
+        if self._attr_native_value == 999:
+            self._attr_native_value = None

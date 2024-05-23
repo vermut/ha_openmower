@@ -9,7 +9,6 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import slugify, Throttle
 from homeassistant.util.json import json_loads_object
-
 from .const import DOMAIN
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=5)

@@ -8,7 +8,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_PREFIX, EntityCategory
+from homeassistant.const import CONF_PREFIX
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .entity import OpenMowerMqttEntity
@@ -29,11 +29,11 @@ async def async_setup_entry(
     prefix = entry.data[CONF_PREFIX]
     async_add_entities(
         [
-            OpenMowerMqttBinarySensorEntity(
+            OpenMowerEmergencySensor(
                 "Emergency", prefix, "robot_state/json", "emergency"
             ),
-            OpenMowerMqttBinarySensorEntity(
-                "Is charging", prefix, "robot_state/json", "is_charging"
+            OpenMowerIsChargingSensor(
+                "Is Charging", prefix, "robot_state/json", "is_charging"
             ),
         ]
     )
@@ -42,3 +42,11 @@ async def async_setup_entry(
 class OpenMowerMqttBinarySensorEntity(OpenMowerMqttEntity, BinarySensorEntity):
     def _process_update(self, value):
         self._attr_is_on = bool(value)
+
+
+class OpenMowerIsChargingSensor(OpenMowerMqttBinarySensorEntity):
+    _attr_device_class = BinarySensorDeviceClass.BATTERY_CHARGING
+
+
+class OpenMowerEmergencySensor(OpenMowerMqttBinarySensorEntity):
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
