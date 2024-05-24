@@ -41,13 +41,13 @@
       "name": "Skip Path"
     },
     "send_command": {
+      "name": "Send arbitrary command",
       "description": "Sends arbitrary commands to action topic",
       "fields": {
         "payload": {
           "description": "Known commands: mower_logic:idle/start_mowing\nmower_logic:mowing/pause\nmower_logic:area_recording/start_recording\nmower_logic:area_recording/exit_recording_mode\nmower_logic:area_recording/finish_discard\nmower_logic:area_recording/finish_mowing_area\nmower_logic:area_recording/finish_navigation_area\nmower_logic:area_recording/record_dock\nmower_logic:area_recording/stop_recording\nmower_logic:idle/start_area_recording\nmower_logic:mowing/abort_mowing\nmower_logic:mowing/skip_area\nmower_logic:mowing/skip_path\nmower_logic:mowing/continue",
           "name": "Command payload"
-        },
-        "name": "Send arbitrary command"
+        }
       }
     }
   }
