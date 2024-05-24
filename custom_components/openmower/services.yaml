@@ -1,0 +1,16 @@
+command_idle_start_mowing: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+command_mowing_pause: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+command_mowing_continue: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+command_mowing_abort_mowing: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+command_mowing_skip_area: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+command_mowing_skip_path: { target: { entity: { domain: lawn_mower, integration: openmower } } }
+
+send_command:
+  target:
+    entity: { domain: lawn_mower, integration: openmower }
+  fields:
+    payload:
+      required: true
+      example: "mower_logic:idle/start_area_recording"
+      selector:
+        text:
