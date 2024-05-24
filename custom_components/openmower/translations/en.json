@@ -4,7 +4,7 @@
       "already_configured": "Device is already configured"
     },
     "error": {
-      "unknown": "Unexpected error"
+      "unknown": "Unexpected error. Like a bad date, you never see it coming."
     },
     "step": {
       "user": {
@@ -23,26 +23,32 @@
   },
   "services": {
     "command_idle_start_mowing": {
-      "name": "Start Mowing"
+      "name": "Start Mowing",
+      "description": "Like the starting gun at a race, only less noisy."
     },
     "command_mowing_pause": {
-      "name": "Pause Mowing"
+      "name": "Pause Mowing",
+      "description": "Like a coffee break, but for your mower."
     },
     "command_mowing_continue": {
-      "name": "Continue Mowing"
+      "name": "Continue Mowing",
+      "description": "Because nothing says 'fun' like getting back to work."
     },
     "command_mowing_abort_mowing": {
-      "name": "Stop Mowing"
+      "name": "Stop Mowing",
+      "description": "Like a red light for your mower."
     },
     "command_mowing_skip_area": {
-      "name": "Skip Area"
+      "name": "Skip Area",
+      "description": "Like playing hopscotch with your mower. Only less dangerous."
     },
     "command_mowing_skip_path": {
-      "name": "Skip Path"
+      "name": "Skip Path",
+      "description": "Like a detour, but for your mower."
     },
     "send_command": {
       "name": "Send arbitrary command",
-      "description": "Sends arbitrary commands to action topic",
+      "description": "Like shouting orders into the void.",
       "fields": {
         "payload": {
           "description": "Known commands: mower_logic:idle/start_mowing\nmower_logic:mowing/pause\nmower_logic:area_recording/start_recording\nmower_logic:area_recording/exit_recording_mode\nmower_logic:area_recording/finish_discard\nmower_logic:area_recording/finish_mowing_area\nmower_logic:area_recording/finish_navigation_area\nmower_logic:area_recording/record_dock\nmower_logic:area_recording/stop_recording\nmower_logic:idle/start_area_recording\nmower_logic:mowing/abort_mowing\nmower_logic:mowing/skip_area\nmower_logic:mowing/skip_path\nmower_logic:mowing/continue",
