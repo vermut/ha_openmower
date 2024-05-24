@@ -24,8 +24,8 @@ async def async_setup_entry(
         return
 
     # Make sure MQTT integration is enabled and the client is available
-    if not (entry.data[CONF_LATITUDE] and entry.data[CONF_LONGITUDE]):
-        _LOGGER.error("MQTT integration is not available")
+    if not (CONF_LATITUDE in entry.data and CONF_LONGITUDE in entry.data):
+        _LOGGER.info("Datum point not provided, not creating tracker entity")
         return
 
     async_add_entities(
