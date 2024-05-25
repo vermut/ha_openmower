@@ -1,7 +1,6 @@
 import logging
 
 import voluptuous as vol
-
 from homeassistant.components import mqtt
 from homeassistant.components.lawn_mower import (
     LawnMowerActivity,
@@ -16,6 +15,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify
 from homeassistant.util.json import json_loads_object
+
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)

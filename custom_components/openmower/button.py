@@ -44,6 +44,8 @@ class OpenMowerMqttButtonEntity(OpenMowerMqttEntity, ButtonEntity):
 
 
 class OpenMowerSkipAreaButton(OpenMowerMqttButtonEntity):
+    _attr_icon = "mdi:crop-free"
+
     async def async_press(self) -> None:
         await mqtt.async_publish(
             self.hass,
@@ -53,6 +55,8 @@ class OpenMowerSkipAreaButton(OpenMowerMqttButtonEntity):
 
 
 class OpenMowerSkipPathButton(OpenMowerMqttButtonEntity):
+    _attr_icon = "mdi:vector-line"
+
     async def async_press(self) -> None:
         await mqtt.async_publish(
             self.hass,

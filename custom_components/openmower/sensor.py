@@ -21,6 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
 from .entity import OpenMowerMqttEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ async def async_setup_entry(
             OpenMowerGpsPercentageSensor(
                 "GPS Percentage", prefix, "robot_state/json", "gps_percentage"
             ),
-            OpenMowerMqttSensorEntity(
+            OpenMowerCurrentStateEntity(
                 "Current State", prefix, "robot_state/json", "current_state"
             ),
             OpenMowerCurrentSensor(
@@ -90,6 +91,10 @@ class OpenMowerMqttSensorEntity(OpenMowerMqttEntity, SensorEntity):
         self._attr_native_value = value
 
 
+class OpenMowerCurrentStateEntity(OpenMowerMqttSensorEntity):
+    _attr_icon = "mdi:robot-mower"
+
+
 class OpenMowerBatterySensor(OpenMowerMqttSensorEntity):
     _attr_device_class = SensorDeviceClass.BATTERY
     _attr_native_unit_of_measurement = PERCENTAGE
@@ -100,6 +105,7 @@ class OpenMowerBatterySensor(OpenMowerMqttSensorEntity):
 
 
 class OpenMowerGpsPercentageSensor(OpenMowerMqttSensorEntity):
+    _attr_icon = "mdi:crosshairs-gps"
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
 
