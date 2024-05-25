@@ -20,6 +20,7 @@ from homeassistant.const import (
     UnitOfLength,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .entity import OpenMowerMqttEntity
@@ -55,6 +56,7 @@ async def async_setup_entry(
             OpenMowerCurrentStateEntity(
                 "Current State", prefix, "robot_state/json", "current_state"
             ),
+            OpenMowerVersionEntity("Version", prefix, "version", "version"),
             OpenMowerCurrentSensor(
                 "Charge Current", prefix, "sensors/om_charge_current/data", None
             ),
@@ -156,3 +158,14 @@ class OpenMowerGpsAccuracySensor(OpenMowerRawDiagnosticSensor):
         super()._process_update(value)
         if self._attr_native_value == 999:
             self._attr_native_value = None
+
+
+class OpenMowerVersionEntity(OpenMowerMqttSensorEntity):
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:timeline-check-outline"
+
+    def _process_update(self, value):
+        super()._process_update(value)
+
+        device_registry = dr.async_get(self.hass)
+        device_registry.async_update_device(self.device_entry.id, sw_version=value)
