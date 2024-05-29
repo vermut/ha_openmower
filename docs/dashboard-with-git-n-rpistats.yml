@@ -1,0 +1,121 @@
+views:
+  - title: Openmower
+    path: Openmower
+    icon: mdi:robot-mower-outline
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entity
+            entity: lawn_mower.openmower
+          - type: horizontal-stack
+            cards:
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.start_mowing
+                icon: mdi:play
+                name: Start
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.pause_mowing
+                icon: mdi:pause
+                name: Pause
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                icon: ''
+                entity: button.openmower_skip_path
+                name: Skip path
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: button.openmower_skip_area_2
+                icon: ''
+                name: Skip area
+              - show_name: true
+                show_icon: true
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.return_to_dock
+                icon: ''
+          - type: entities
+            entities:
+              - entity: sensor.battery
+                name: Battery
+              - entity: sensor.openmower_current_state_2
+                name: Current State
+              - entity: binary_sensor.openmower_emergency_2
+                name: Emergency
+              - entity: sensor.openmower_gps_percentage
+                name: GPS Percentage
+              - entity: binary_sensor.openmower_is_charging_2
+                name: Is Charging
+            title: Openmower
+          - type: map
+            entities:
+              - entity: device_tracker.openmower
+            default_zoom: 20
+            hours_to_show: 24
+            theme_mode: auto
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.openmower_battery_voltage
+                name: Battery Voltage
+              - entity: sensor.openmower_charge_current_2
+                name: Charge Current
+              - entity: sensor.openmower_charge_voltage
+                name: Charge Voltage
+              - entity: sensor.openmower_current_action_progress
+                name: Current action progress
+              - entity: sensor.openmower_gps_accuracy
+                name: GPS Accuracy
+              - entity: sensor.openmower_left_esc_temperature
+                name: Left ESC Temperature
+              - entity: sensor.openmower_mow_esc_temperature
+                name: Mow ESC Temperature
+              - entity: sensor.openmower_mow_motor_current_2
+                name: Mow Motor Current
+              - entity: sensor.openmower_mow_motor_temperature
+                name: Mow Motor Temperature
+              - entity: device_tracker.openmower
+                name: Position
+              - entity: sensor.openmower_right_esc_temperature
+                name: Right ESC Temperature
+              - entity: sensor.openmower_version
+                name: Version
+            title: Openmower
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.clemenselflein_open_mower_ros_latest_commit
+              - entity: sensor.clemenselflein_openmower_latest_commit
+              - entity: sensor.clemenselflein_openmoweros_latest_commit
+            title: GIT - latest commits
+          - type: entities
+            entities:
+              - entity: sensor.raspberrypi_cpu_clock_speed
+                name: CPU Clock Speed
+              - entity: sensor.raspberrypi_cpu_temperature
+                name: CPU Temperature
+              - entity: sensor.raspberrypi_cpu_usage
+                name: CPU Usage
+              - entity: sensor.raspberrypi_memory_usage
+                name: Memory Usage
+              - entity: sensor.raspberrypi_uptime
+                name: Uptime
+              - entity: sensor.raspberrypi_wifi_signal
+                name: Wifi Signal
+            title: rpi stats
