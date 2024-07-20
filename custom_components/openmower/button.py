@@ -28,6 +28,7 @@ async def async_setup_entry(
         [
             OpenMowerSkipAreaButton("Skip Area", prefix, "DUMMY", None),
             OpenMowerSkipPathButton("Skip Path", prefix, "DUMMY", None),
+            OpenMowerResetEmergencyButton("Reset Emergency", prefix, "DUMMY", None),
         ]
     )
 
@@ -62,4 +63,15 @@ class OpenMowerSkipPathButton(OpenMowerMqttButtonEntity):
             self.hass,
             self._mqtt_topic_prefix + "action",
             "mower_logic:mowing/skip_path",
+        )
+
+
+class OpenMowerResetEmergencyButton(OpenMowerMqttButtonEntity):
+    _attr_icon = "mdi:alert-remove-outline"
+
+    async def async_press(self) -> None:
+        await mqtt.async_publish(
+            self.hass,
+            self._mqtt_topic_prefix + "action",
+            "mower_logic/reset_emergency",
         )
