@@ -84,6 +84,9 @@ async def async_setup_entry(
             OpenMowerVoltageSensor(
                 "Charge Voltage", prefix, "sensors/om_v_charge/data", None
             ),
+            OpenMowerCurrentAreaSensor(
+                "Current Area", prefix, "robot_state/json", "current_area"
+            )
         ]
     )
 
@@ -137,6 +140,8 @@ class OpenMowerCurrentSensor(OpenMowerRawDiagnosticSensor):
     _attr_suggested_display_precision = 1
 
 
+
+
 class OpenMowerTemperatureSensor(OpenMowerRawDiagnosticSensor):
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
@@ -158,6 +163,16 @@ class OpenMowerGpsAccuracySensor(OpenMowerRawDiagnosticSensor):
         super()._process_update(value)
         if self._attr_native_value == 999:
             self._attr_native_value = None
+
+class OpenMowerCurrentAreaSensor(OpenMowerMqttSensorEntity):
+    _attr_icon = "mdi:texture-box"
+    entity_description = SensorEntityDescription(
+        key="currentarea",
+        entity_registry_enabled_default=True,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+    
+    
 
 
 class OpenMowerVersionEntity(OpenMowerMqttSensorEntity):
