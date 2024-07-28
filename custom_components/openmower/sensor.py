@@ -86,6 +86,9 @@ async def async_setup_entry(
             ),
             OpenMowerCurrentAreaSensor(
                 "Current Area", prefix, "robot_state/json", "current_area"
+            ),
+            OpenMowerCurrentPathSensor(
+                "Current Path", prefix, "robot_state/json", "current_path"
             )
         ]
     )
@@ -140,8 +143,6 @@ class OpenMowerCurrentSensor(OpenMowerRawDiagnosticSensor):
     _attr_suggested_display_precision = 1
 
 
-
-
 class OpenMowerTemperatureSensor(OpenMowerRawDiagnosticSensor):
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
@@ -164,15 +165,23 @@ class OpenMowerGpsAccuracySensor(OpenMowerRawDiagnosticSensor):
         if self._attr_native_value == 999:
             self._attr_native_value = None
 
+
 class OpenMowerCurrentAreaSensor(OpenMowerMqttSensorEntity):
-    _attr_icon = "mdi:texture-box"
+    _attr_icon = "mdi:crop-free"
     entity_description = SensorEntityDescription(
         key="currentarea",
         entity_registry_enabled_default=True,
         entity_category=EntityCategory.DIAGNOSTIC,
     )
-    
-    
+
+
+class OpenMowerCurrentPathSensor(OpenMowerMqttSensorEntity):
+    _attr_icon = "mdi:vector-line"
+    entity_description = SensorEntityDescription(
+        key="currentpath",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
 
 
 class OpenMowerVersionEntity(OpenMowerMqttSensorEntity):
