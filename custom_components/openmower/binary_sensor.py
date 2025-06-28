@@ -36,6 +36,10 @@ async def async_setup_entry(
             OpenMowerIsChargingSensor(
                 "Is Charging", prefix, "robot_state/json", "is_charging"
             ),
+            OpenMowerRainSensor(
+                "Is Raining", prefix, "robot_state/json", "rain_detected"
+            )
+            
         ]
     )
 
@@ -51,3 +55,7 @@ class OpenMowerIsChargingSensor(OpenMowerMqttBinarySensorEntity):
 
 class OpenMowerEmergencySensor(OpenMowerMqttBinarySensorEntity):
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
+    
+class OpenMowerRainSensor(OpenMowerMqttBinarySensorEntity):
+    _attr_device_class = BinarySensorDeviceClass.MOISTURE
+    _attr_icon = "mdi:weather-pouring"
