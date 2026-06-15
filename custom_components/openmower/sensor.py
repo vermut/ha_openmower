@@ -56,7 +56,7 @@ async def async_setup_entry(
             OpenMowerCurrentStateEntity(
                 "Current State", prefix, "robot_state/json", "current_state"
             ),
-            OpenMowerVersionEntity("Version", prefix, "version", "version"),
+            OpenMowerVersionEntity("Version", prefix, "version/json", "version"),
             OpenMowerCurrentSensor(
                 "Charge Current", prefix, "sensors/om_charge_current/data", None
             ),
