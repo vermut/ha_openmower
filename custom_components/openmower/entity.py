@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import timedelta
-from typing import Optional
+from typing import Optional, Union
 
 from homeassistant.components import mqtt
 from homeassistant.core import callback
@@ -19,7 +19,13 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=5)
 class OpenMowerMqttEntity(Entity):
     _attr_has_entity_name = True
 
-    def __init__(self, name: str, prefix: str, topic: str, key: Optional[str]) -> None:
+    def __init__(
+        self,
+        name: str,
+        prefix: str,
+        topic: Union[str, list[str]],
+        key: Optional[str],
+    ) -> None:
         self._attr_name = name
         self._attr_unique_id = slugify(f"{prefix}_{name}").lower()
 
@@ -29,7 +35,7 @@ class OpenMowerMqttEntity(Entity):
             name=slugify(prefix).capitalize(),
         )
 
-        self._mqtt_topic = topic
+        self._mqtt_topics = [topic] if isinstance(topic, str) else list(topic)
         self._mqtt_topic_prefix = prefix
         self._mqtt_payload_json_key = key
         self._unsub_mqtt: list[Callable] = []
@@ -38,14 +44,15 @@ class OpenMowerMqttEntity(Entity):
             self._mqtt_topic_prefix = self._mqtt_topic_prefix + "/"
 
     async def async_added_to_hass(self) -> None:
-        self._unsub_mqtt.append(
-            await mqtt.async_subscribe(
-                self.hass,
-                self._mqtt_topic_prefix + self._mqtt_topic,
-                self._async_robot_state_received,
-                0,
+        for topic in self._mqtt_topics:
+            self._unsub_mqtt.append(
+                await mqtt.async_subscribe(
+                    self.hass,
+                    self._mqtt_topic_prefix + topic,
+                    self._async_robot_state_received,
+                    0,
+                )
             )
-        )
 
     async def async_will_remove_from_hass(self) -> None:
         for unsub in self._unsub_mqtt:
