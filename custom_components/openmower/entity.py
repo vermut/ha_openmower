@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import timedelta
 from typing import Optional, Union
 
@@ -37,18 +38,26 @@ class OpenMowerMqttEntity(Entity):
         self._mqtt_topics = [topic] if isinstance(topic, str) else list(topic)
         self._mqtt_topic_prefix = prefix
         self._mqtt_payload_json_key = key
+        self._unsub_mqtt: list[Callable] = []
 
         if self._mqtt_topic_prefix and self._mqtt_topic_prefix[-1] != "/":
             self._mqtt_topic_prefix = self._mqtt_topic_prefix + "/"
 
     async def async_added_to_hass(self) -> None:
         for topic in self._mqtt_topics:
-            await mqtt.async_subscribe(
-                self.hass,
-                self._mqtt_topic_prefix + topic,
-                self._async_robot_state_received,
-                0,
+            self._unsub_mqtt.append(
+                await mqtt.async_subscribe(
+                    self.hass,
+                    self._mqtt_topic_prefix + topic,
+                    self._async_robot_state_received,
+                    0,
+                )
             )
+
+    async def async_will_remove_from_hass(self) -> None:
+        for unsub in self._unsub_mqtt:
+            unsub()
+        self._unsub_mqtt.clear()
 
     @callback
     def _async_robot_state_received(self, msg: mqtt.ReceiveMessage) -> None:

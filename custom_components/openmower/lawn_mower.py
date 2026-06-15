@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Callable
 
 import voluptuous as vol
 from homeassistant.components import mqtt
@@ -79,15 +80,24 @@ class OpenMowerEntity(LawnMowerEntity):
         if self._mqtt_topic_prefix and self._mqtt_topic_prefix[-1] != "/":
             self._mqtt_topic_prefix = self._mqtt_topic_prefix + "/"
 
+        self._unsub_mqtt: list[Callable] = []
+
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
-        await mqtt.async_subscribe(
-            self.hass,
-            self._mqtt_topic_prefix + "robot_state/json",
-            self.async_robot_state_received,
-            0,
+        self._unsub_mqtt.append(
+            await mqtt.async_subscribe(
+                self.hass,
+                self._mqtt_topic_prefix + "robot_state/json",
+                self.async_robot_state_received,
+                0,
+            )
         )
         _LOGGER.info("Added to Hass, subscribing to topics")
+
+    async def async_will_remove_from_hass(self) -> None:
+        for unsub in self._unsub_mqtt:
+            unsub()
+        self._unsub_mqtt.clear()
 
     @callback
     def async_robot_state_received(self, msg: mqtt.ReceiveMessage) -> None:
