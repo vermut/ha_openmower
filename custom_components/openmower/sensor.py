@@ -19,9 +19,11 @@ from homeassistant.const import (
     UnitOfElectricCurrent,
     UnitOfLength,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_call_later
+from homeassistant.util.json import json_loads_object
 
 from .entity import OpenMowerMqttEntity
 
@@ -197,6 +199,55 @@ class OpenMowerCurrentPathSensor(OpenMowerMqttSensorEntity):
 class OpenMowerVersionEntity(OpenMowerMqttSensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_icon = "mdi:timeline-check-outline"
+
+    # Prefer the authoritative "version/json" topic. The legacy "version"
+    # topic may carry a stale retained value left on the broker after a
+    # firmware upgrade, so it is only applied as a fallback.
+    _PREFERRED_TOPIC_SUFFIX = "version/json"
+    # Both topics are usually retained and arrive together at startup. Wait
+    # this long for "version/json" before falling back to the legacy topic,
+    # so the stale value never briefly shows.
+    _LEGACY_GRACE_SECONDS = 2
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._preferred_seen = False
+        self._cancel_legacy = None
+
+    @callback
+    def _async_robot_state_received(self, msg: mqtt.ReceiveMessage) -> None:
+        version = json_loads_object(msg.payload)[self._mqtt_payload_json_key]
+
+        if msg.topic.endswith(self._PREFERRED_TOPIC_SUFFIX):
+            self._preferred_seen = True
+            if self._cancel_legacy is not None:
+                self._cancel_legacy()
+                self._cancel_legacy = None
+            self._apply_version(version)
+            return
+
+        # Legacy topic: ignored once the authoritative one has been seen,
+        # otherwise applied only after a short grace period.
+        if self._preferred_seen:
+            return
+
+        @callback
+        def _apply_legacy(_now) -> None:
+            self._cancel_legacy = None
+            if not self._preferred_seen:
+                self._apply_version(version)
+
+        if self._cancel_legacy is not None:
+            self._cancel_legacy()
+        self._cancel_legacy = async_call_later(
+            self.hass, self._LEGACY_GRACE_SECONDS, _apply_legacy
+        )
+
+    def _apply_version(self, version) -> None:
+        # Bypass the base-class Throttle so neither version message is dropped
+        # when both arrive close together at startup.
+        self._process_update(version)
+        self.async_write_ha_state()
 
     def _process_update(self, value):
         super()._process_update(value)
