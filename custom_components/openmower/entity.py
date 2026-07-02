@@ -67,8 +67,15 @@ class OpenMowerMqttEntity(Entity):
     def _update_state(self, msg):
         if self._mqtt_payload_json_key:
             value_json = json_loads_object(msg.payload)
+            if self._mqtt_payload_json_key not in value_json:
+                self._attr_available = False
+                self.async_write_ha_state()
+                return
+
+            self._attr_available = True
             self._process_update(value_json[self._mqtt_payload_json_key])
         else:
+            self._attr_available = True
             self._process_update(msg.payload)
         self.async_write_ha_state()
 
